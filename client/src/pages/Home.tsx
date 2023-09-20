@@ -43,21 +43,21 @@ export const Home = () => {
       });
   };
 
-  const signInAsAdminHandler = async () => {
-    const res = await fetch("/api/auth/signinAsAdmin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        password: "this is the test password",
-      }),
-    });
+  // const signInAsAdminHandler = async () => {
+  //   const res = await fetch("/api/auth/signinAsAdmin", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       password: "this is the test password",
+  //     }),
+  //   });
 
-    if (res.status === 200) {
-      setIsSignedIn(true);
-    }
-  };
+  //   if (res.status === 200) {
+  //     setIsSignedIn(true);
+  //   }
+  // };
 
   const checkIfSignedIn = async () => {
     const res = await fetch("/api/auth/isSignedIn", {
