@@ -5,3 +5,8 @@
 #root {
   min-height: 100vh;
 }
+
+#html5qr-code-full-region__dashboard,
+#html5qr-code-full-region__header_message {
+  display: none;
+}
