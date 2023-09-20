@@ -31,7 +31,6 @@ router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
   try {
     signinAsAdmin(adminId, password);
     req.session.member = adminId;
-    console.log(req.session);
     res.sendStatus(200);
   } catch (e) {
     console.log(e);
@@ -80,7 +79,6 @@ const signinAsAdmin = (uuid: string, password: string) => {
   if (member.password !== password) {
     throw new Error("Wrong password");
   }
-  console.log("you are an admin");
   return true;
 };
 

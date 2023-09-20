@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Member } from "../../../server/api/members";
+import { Auth } from "../components/Auth";
 
 export const Home = () => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -42,8 +43,8 @@ export const Home = () => {
       });
   };
 
-  const signInAsAdminHandler = () => {
-    fetch("/api/auth/signinAsAdmin", {
+  const signInAsAdminHandler = async () => {
+    const res = await fetch("/api/auth/signinAsAdmin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,6 +53,10 @@ export const Home = () => {
         password: "this is the test password",
       }),
     });
+
+    if (res.status === 200) {
+      setIsSignedIn(true);
+    }
   };
 
   const checkIfSignedIn = async () => {
@@ -86,11 +91,7 @@ export const Home = () => {
             </button>
           </>
         )}
-        {!isSignedIn && (
-          <button className="btn btn-primary" onClick={signInAsAdminHandler}>
-            signin as admin
-          </button>
-        )}
+        {!isSignedIn && <Auth />}
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
   return (
     <>
-      <div className="navbar fixed top-2 bg-base-100 rounded-3xl shadow-lg w-[calc(100%-10px)] mx-auto border border-gray">
+      <div className="navbar fixed top-3 left-2 bg-base-100 rounded-3xl shadow-lg w-[calc(100%-1rem)] border border-gray">
         <div className="navbar-start">
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-ghost btn-circle">
