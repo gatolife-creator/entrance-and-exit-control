@@ -28,17 +28,41 @@ export const Home = () => {
         age: 20,
         gender: "male",
       }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.id);
+      });
+  };
+
+  const signInAsAdminHandler = () => {
+    fetch("/api/auth/signinAsAdmin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: "this is the test password",
+      }),
     });
   };
+
   return (
     <div>
       <h1 className="text-4xl">Members</h1>
       <ul>
         {members.length > 0 &&
-          members.map((member) => <li key={member.id}>{member.name}</li>)}
+          members.map((member) => (
+            <li key={member.id}>
+              {member.id}: {member.name}
+            </li>
+          ))}
       </ul>
       <button className="btn btn-primary" onClick={addButtonHandler}>
         add
+      </button>
+      <button className="btn btn-primary" onClick={signInAsAdminHandler}>
+        signin as admin
       </button>
     </div>
   );

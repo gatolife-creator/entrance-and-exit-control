@@ -1,6 +1,6 @@
 export const Navbar = () => {
   return (
-    <div className="navbar bg-base-100 rounded-3xl shadow-lg w-[calc(100%-10px)] mx-auto mt-2 border">
+    <div className="navbar bg-base-100 rounded-3xl shadow-lg w-[calc(100%-10px)] mx-auto mt-2 border border-gray">
       <div className="navbar-start">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost btn-circle">
