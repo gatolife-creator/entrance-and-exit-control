@@ -3,6 +3,8 @@ import { Member } from "../../../server/api/members";
 
 export const Home = () => {
   const [members, setMembers] = useState<Member[]>([]);
+  const [isMemberAdded, setIsMemberAdded] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
     fetch("/api/members", {
@@ -15,7 +17,10 @@ export const Home = () => {
       .then((data) => {
         setMembers(data.members);
       });
-  }, []);
+    setIsMemberAdded(false);
+    checkIfSignedIn();
+    console.log("run");
+  }, [isMemberAdded]);
 
   const addButtonHandler = () => {
     fetch("/api/members/add", {
@@ -30,8 +35,10 @@ export const Home = () => {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data.id);
+      .then(() => {
+        if (!isMemberAdded) {
+          setIsMemberAdded(true);
+        }
       });
   };
 
@@ -47,23 +54,44 @@ export const Home = () => {
     });
   };
 
+  const checkIfSignedIn = async () => {
+    const res = await fetch("/api/auth/isSignedIn", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res.status === 200) {
+      setIsSignedIn(true);
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-4xl">Members</h1>
-      <ul>
-        {members.length > 0 &&
-          members.map((member) => (
-            <li key={member.id}>
-              {member.id}: {member.name}
-            </li>
-          ))}
-      </ul>
-      <button className="btn btn-primary" onClick={addButtonHandler}>
-        add
-      </button>
-      <button className="btn btn-primary" onClick={signInAsAdminHandler}>
-        signin as admin
-      </button>
-    </div>
+    <>
+      <div className="container mx-auto">
+        {isSignedIn && (
+          <>
+            <h1 className="text-4xl">Members</h1>
+            <ul>
+              {members.length > 0 &&
+                members.map((member) => (
+                  <li key={member.id}>
+                    {member.id}: {member.name}
+                  </li>
+                ))}
+            </ul>
+            <button className="btn btn-primary" onClick={addButtonHandler}>
+              add
+            </button>
+          </>
+        )}
+        {!isSignedIn && (
+          <button className="btn btn-primary" onClick={signInAsAdminHandler}>
+            signin as admin
+          </button>
+        )}
+      </div>
+    </>
   );
 };
