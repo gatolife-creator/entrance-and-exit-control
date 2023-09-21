@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { QrReader } from "react-qr-reader";
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export const Auth = (props: Props) => {
@@ -32,7 +32,7 @@ export const Auth = (props: Props) => {
         password,
       }),
     });
-    
+
     if (res.status === 200) {
       setIsValid(true);
     }

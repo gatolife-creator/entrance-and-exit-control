@@ -66,7 +66,7 @@ router.get("/profile", (req: express.Request, res: express.Response) => {
 router.post("/add", (req: express.Request, res: express.Response) => {
   const { name, age, gender } = req.body;
   const id = add(name as string, Number(age), gender as "male" | "female");
-  res.json({ id });
+  res.json({ member: members.find((member) => member.id === id) });
 });
 
 router.delete("/remove", (req: express.Request) => {
