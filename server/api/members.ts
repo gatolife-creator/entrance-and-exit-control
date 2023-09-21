@@ -17,7 +17,7 @@ export type Member = {
 };
 
 // Init admin info
-export const adminId = uuidv4();
+export const adminId = "db931138-7efd-403d-87eb-6cd9dd0df187";
 export const members: Member[] = [
   {
     id: adminId,

@@ -3,6 +3,7 @@ import { QrReader } from "react-qr-reader";
 
 export const Auth = () => {
   const [uuid, setUuid] = useState("");
+  const [password, setPassword] = useState("");
   const [isReaderOn, setIsReaderOn] = useState(false);
   const [isRead, setIsRead] = useState(false);
 
@@ -19,7 +20,7 @@ export const Auth = () => {
       },
       body: JSON.stringify({
         uuid,
-        password: e.currentTarget.textContent,
+        password,
       }),
     });
 
@@ -81,9 +82,10 @@ export const Auth = () => {
                   <input
                     type="password"
                     className="input input-bordered w-full max-w-xs"
-                    id="exampleFormControlInput22"
+                    id="password"
                     autoComplete="true"
                     placeholder="Password"
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 
