@@ -1,6 +1,5 @@
 import express from "express";
 import { adminId, members } from "./members";
-import session from "express-session";
 
 const router = express.Router();
 
