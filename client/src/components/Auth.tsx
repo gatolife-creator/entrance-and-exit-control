@@ -29,7 +29,7 @@ export const Auth = () => {
   };
 
   return (
-    <div className="w-[300px] h-[450px] mx-auto mt-16 border shadow-xl rounded-lg">
+    <div className="w-[300px] h-[450px] mx-auto mt-16 border shadow-xl rounded-3xl">
       <div className="g-6 flex h-full flex-wrap items-center justify-center">
         <div className="mb-12 md:mb-0 w-full text-center p-5">
           {!isRead && (
@@ -37,7 +37,6 @@ export const Auth = () => {
               {isReaderOn && (
                 <QrReader
                   onResult={async (result) => {
-                    console.log(result?.getText());
                     if (result) {
                       navigator.mediaDevices
                         .getUserMedia({
@@ -54,6 +53,7 @@ export const Auth = () => {
                       setUuid(result.getText());
                     }
                   }}
+                  constraints={{ facingMode: undefined }}
                 />
               )}
               <button className="btn btn-primary mt-5" onClick={clickHandler}>
@@ -64,7 +64,7 @@ export const Auth = () => {
           {isRead && (
             <>
               <form onSubmit={submitHandler}>
-                <h1 className="text-2xl">Successful scanned!</h1>
+                <h1 className="text-2xl">Successfully scanned!</h1>
                 <p className="text-lg">Please complete your password.</p>
                 <div className="relative mb-6" data-te-input-wrapper-init>
                   <input

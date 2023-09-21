@@ -1,14 +1,17 @@
 import express from "express";
 import session from "express-session";
 import path from "path";
+import * as dotenv from "dotenv";
 
 import { router as membersRouter } from "./api/members";
 import { router as authRouter } from "./api/auth";
 
+dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3001;
 const session_option = {
-  secret: "secret",
+  secret: process.env.SESSION_SECRET_KEY as string,
   cookie: {
     maxAge: 60 * 60 * 1000,
   },
