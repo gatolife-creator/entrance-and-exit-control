@@ -33,7 +33,7 @@ router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
     res.sendStatus(200);
   } catch (e) {
     console.log(e);
-    res.sendStatus(401);
+    res.status(401).json({ message: "Wrong password" });
   }
 });
 
@@ -41,7 +41,7 @@ router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
   if (req.session.member) {
     res.sendStatus(200);
   } else {
-    res.sendStatus(401);
+    res.status(401).json({ message: "Not signed in" });
   }
 });
 

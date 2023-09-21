@@ -1,4 +1,5 @@
 import express from "express";
+// @ts-ignore
 import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import * as dotenv from "dotenv";

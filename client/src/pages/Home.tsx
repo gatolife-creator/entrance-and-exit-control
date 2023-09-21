@@ -7,22 +7,28 @@ export const Home = () => {
   const [isMemberAdded, setIsMemberAdded] = useState(false);
 
   useEffect(() => {
-    fetch("/api/members", {
+    getMembers();
+  }, [isMemberAdded]);
+
+  const getMembers = async () => {
+    const res = await fetch("/api/members", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setMembers(data.members);
-      });
-    setIsMemberAdded(false);
-    console.log("run");
-  }, [isMemberAdded]);
+    });
 
-  const addButtonHandler = () => {
-    fetch("/api/members/add", {
+    const data = await res.json();
+    if (res.status === 200) {
+      setMembers(data.members);
+      setIsMemberAdded(true);
+    } else {
+      console.error(data.message);
+    }
+  };
+
+  const addButtonHandler = async () => {
+    const res = await fetch("/api/members/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,13 +38,14 @@ export const Home = () => {
         age: 20,
         gender: "male",
       }),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        if (!isMemberAdded) {
-          setIsMemberAdded(true);
-        }
-      });
+    });
+
+    const data = await res.json();
+    if (res.status === 200) {
+      setIsMemberAdded(true);
+    } else {
+      console.error(data.message);
+    }
   };
 
   return (
