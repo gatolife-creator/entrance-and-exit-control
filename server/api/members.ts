@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import * as dotenv from "dotenv";
 import QRCode from "qrcode";
@@ -6,6 +7,12 @@ import QRCode from "qrcode";
 dotenv.config();
 
 const router = express.Router();
+
+declare module "express-session" {
+  export interface SessionData {
+    member: string;
+  }
+}
 
 export type Member = {
   id: string;
@@ -29,11 +36,22 @@ export const members: Member[] = [
   },
 ];
 
-console.log(adminId);
 QRCode.toFile("resources/admin.png", adminId);
 
 router.use(express.json());
 
+router.use(
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (!req.session.member) {
+      res.status(401).json({ message: "Unauthorized" });
+    } else {
+      next();
+    }
+  }
+);
+
+// FIXME 以下のAPIが認証済みのメンバー、もしは管理者のみが呼び出せるようにしたい
+// FIXME とりあえずメンバーのみが呼び出せるようにした
 router.get("/", (_: express.Request, res: express.Response) => {
   res.json({ members });
 });
