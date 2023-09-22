@@ -1,7 +1,46 @@
+import { ChangeEvent, FormEvent, useState } from "react";
+import { useMembers } from "../hooks/useMembers";
+
 export const AdminTable = () => {
+  const { members, setMembers } = useMembers();
+  const [name, setName] = useState("");
+  const [age, setAge] = useState(NaN);
+  const [gender, setGender] = useState<"male" | "female">("male");
+
+  const addMember = async (
+    name: string,
+    age: number,
+    gender: "male" | "female"
+  ) => {
+    const res = await fetch("/api/members/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        age,
+        gender,
+      }),
+    });
+    const data = await res.json();
+
+    if (res.status === 200) {
+      setMembers([...members, data.member]);
+    } else {
+      console.log(data.message);
+    }
+  };
+
+  const submitHandler = (e: FormEvent) => {
+    e.preventDefault();
+    addMember(name, age, gender);
+  };
+
   return (
-    <div className="overflow-x-auto">
-      <table className="table">
+    <>
+      <h1 className="text-4xl font-bold text-center py-10">部員管理</h1>
+      <table className="table mb-10">
         {/* head */}
         <thead>
           <tr>
@@ -17,26 +56,27 @@ export const AdminTable = () => {
           </tr>
         </thead>
         <tbody>
-          {/* row 1 */}
-          <tr>
-            <th>
-              <label>
-                <input type="checkbox" className="checkbox" />
-              </label>
-            </th>
-            <td>
-              <div className="flex items-center space-x-3">
-                <div>
-                  <div className="font-bold">太郎一号</div>
+          {members.map((member, index) => (
+            <tr key={index}>
+              <th>
+                <label>
+                  <input type="checkbox" className="checkbox" />
+                </label>
+              </th>
+              <td>
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <div className="font-bold">{member.name}</div>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>高校1年</td>
-            <td>2組</td>
-            <th>
-              <button className="btn btn-ghost btn-xs">details</button>
-            </th>
-          </tr>
+              </td>
+              <td>{member.age}</td>
+              <td>{member.gender}</td>
+              <th>
+                <button className="btn btn-ghost btn-xs">details</button>
+              </th>
+            </tr>
+          ))}
         </tbody>
         {/* foot */}
         <tfoot>
@@ -49,6 +89,54 @@ export const AdminTable = () => {
           </tr>
         </tfoot>
       </table>
-    </div>
+
+      <button
+        className="btn btn-success"
+        // @ts-ignore
+        onClick={() => document.getElementById("my_modal_1").showModal()}
+      >
+        部員追加
+      </button>
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg text-center">部員追加</h3>
+          <form className="text-center space-y-2" onSubmit={submitHandler}>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              placeholder="名前"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setName(e.target.value)
+              }
+            />
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              placeholder="年齢"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setAge(Number(e.target.value))
+              }
+            />
+            <select
+              className="select select-bordered w-full max-w-xs"
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                setGender(e.target.value as "male" | "female")
+              }
+            >
+              <option value="male">男性</option>
+              <option value="female">女性</option>
+            </select>
+            <br />
+            <button className="btn btn-primary">add</button>
+          </form>
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn">閉じる</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    </>
   );
 };

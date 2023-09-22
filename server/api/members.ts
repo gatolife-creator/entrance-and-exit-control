@@ -30,7 +30,7 @@ export const members: Member[] = [
   {
     id: adminId,
     name: "管理者",
-    age: NaN,
+    age: 17,
     gender: "female",
     role: "admin",
     password: process.env.ADMIN_PASSWORD,
@@ -66,7 +66,13 @@ router.get("/profile", (req: express.Request, res: express.Response) => {
 router.post("/add", (req: express.Request, res: express.Response) => {
   const { name, age, gender } = req.body;
   const id = add(name as string, Number(age), gender as "male" | "female");
-  res.json({ member: members.find((member) => member.id === id) });
+  res.json({
+    member: members.find((member) => {
+      if (member.id === id) {
+        return member;
+      }
+    }),
+  });
 });
 
 router.delete("/remove", (req: express.Request) => {
