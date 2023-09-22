@@ -1,12 +1,13 @@
 import { AdminTable } from "../components/AdminTable";
 import { Auth } from "../components/Auth";
+import { Main } from "../components/Main";
 
 export const AdminPage = () => {
   return (
-    <div className="container mx-auto">
+    <Main>
       <Auth>
         <AdminTable />
       </Auth>
-    </div>
+    </Main>
   );
 };

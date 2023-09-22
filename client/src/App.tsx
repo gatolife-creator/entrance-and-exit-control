@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
 import { Navbar } from "./components/Navbar";
 import { Home } from "./pages/Home";
@@ -9,11 +10,13 @@ function App() {
   return (
     <>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/status" element={<Status />} />
-        <Route path="/admin" element={<AdminPage />}></Route>
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/status" element={<Status />} />
+          <Route path="/admin" element={<AdminPage />}></Route>
+        </Routes>
+      </AnimatePresence>
     </>
   );
 }

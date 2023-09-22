@@ -1,11 +1,12 @@
 import { Auth } from "../components/Auth";
+import { Main } from "../components/Main";
 
 export const Home = () => {
   return (
     <>
-      <div className="container mx-auto">
-        <Auth></Auth>
-      </div>
+      <Main>
+        <Auth>TOP PAGE</Auth>
+      </Main>
     </>
   );
 };
