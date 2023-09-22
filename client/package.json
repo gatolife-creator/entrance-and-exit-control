@@ -11,6 +11,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "19.8.1"
+  },
   "dependencies": {
     "framer-motion": "^10.16.4",
     "react": "^18.2.0",
