@@ -3,7 +3,6 @@ import express from "express";
 import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import * as dotenv from "dotenv";
-import QRCode from "qrcode";
 
 dotenv.config();
 
@@ -36,8 +35,6 @@ export const members: Member[] = [
     password: process.env.ADMIN_PASSWORD,
   },
 ];
-
-QRCode.toFile("resources/admin.png", adminId);
 
 router.use(express.json());
 
