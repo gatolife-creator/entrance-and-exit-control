@@ -25,8 +25,21 @@ router.post("/signin", (req: express.Request, res: express.Response) => {
   res.sendStatus(200);
 });
 
+router.post("/setPassword", (req: express.Request, res: express.Response) => {
+  const { uuid, password } = req.body;
+  const member = members.find((member) => member.id === uuid);
+
+  if (member) {
+    member.password = password;
+    res.sendStatus(200);
+  } else {
+    res.status(401).json({ message: `The member ${uuid} was not found` });
+  }
+});
+
 router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
+  console.log(req.body);
   try {
     signinAsAdmin(adminId, password);
     req.session.member = adminId;
@@ -42,6 +55,20 @@ router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
     res.sendStatus(200);
   } else {
     res.status(401).json({ message: "Not signed in" });
+  }
+});
+
+router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
+  const { uuid } = req.body;
+  const member = members.find((member) => member.id === uuid);
+
+  if (member === undefined) {
+    res.status(401).json({ message: `The member ${uuid} was not found` });
+  } else if (member.password === undefined) {
+    res.status(401).json({ message: "Not signed up yet" });
+  } else {
+    res.sendStatus(200);
+    console.log("Already signed up");
   }
 });
 
@@ -61,7 +88,7 @@ const signin = (uuid: string, password: string) => {
   }
 
   if (member.password !== password) {
-    throw new Error("Wrong password");
+    throw new Error(`Wrong password: ${password}`);
   }
 };
 
@@ -76,7 +103,7 @@ const signinAsAdmin = (uuid: string, password: string) => {
   }
 
   if (member.password !== password) {
-    throw new Error("Wrong password");
+    throw new Error(`Wrong password: ${password}`);
   }
   return true;
 };
