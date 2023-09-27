@@ -11,29 +11,25 @@ declare module "express-session" {
 
 router.post("/signup", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
-  signup(uuid, password);
-  res.sendStatus(200);
+  try {
+    signup(uuid, password);
+    res.sendStatus(200);
+  } catch (e) {
+    if (e instanceof Error) {
+      res.status(401).json({ message: e.message });
+    }
+  }
 });
 
 router.post("/signin", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
-  signin(uuid, password);
-
-  Object.assign(req.session, { uuid });
-  console.log(req.session);
-
-  res.sendStatus(200);
-});
-
-router.post("/setPassword", (req: express.Request, res: express.Response) => {
-  const { uuid, password } = req.body;
-  const member = members.find((member) => member.id === uuid);
-
-  if (member) {
-    member.password = password;
+  try {
+    signin(uuid, password);
     res.sendStatus(200);
-  } else {
-    res.status(401).json({ message: `The member ${uuid} was not found` });
+  } catch (e) {
+    if (e instanceof Error) {
+      res.status(401).json({ message: e.message });
+    }
   }
 });
 
