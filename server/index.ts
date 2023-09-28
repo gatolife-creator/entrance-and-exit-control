@@ -4,6 +4,7 @@ import path from "path";
 import * as dotenv from "dotenv";
 
 import { router as membersRouter } from "./api/members";
+import { router as adminRouter } from "./api/admin";
 import { router as authRouter } from "./api/auth";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.urlencoded());
 app.use(express.static(path.join(__dirname, "../client/dist")));
 app.use(session(session_option));
 app.use("/api/members", membersRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/auth", authRouter);
 
 app.get("*", (req: express.Request, res: express.Response) => {

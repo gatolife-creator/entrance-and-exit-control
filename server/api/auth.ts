@@ -5,7 +5,7 @@ const router = express.Router();
 
 declare module "express-session" {
   export interface SessionData {
-    member: string;
+    uuid: string;
   }
 }
 
@@ -34,11 +34,11 @@ router.post("/signin", (req: express.Request, res: express.Response) => {
 });
 
 router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
-  const { uuid, password } = req.body;
+  const { password } = req.body;
   console.log(req.body);
   try {
     signinAsAdmin(adminId, password);
-    req.session.member = adminId;
+    req.session.uuid = adminId;
     res.sendStatus(200);
   } catch (e) {
     console.log(e);
@@ -47,7 +47,7 @@ router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
 });
 
 router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
-  if (req.session.member) {
+  if (req.session.uuid) {
     res.sendStatus(200);
   } else {
     res.status(401).json({ message: "Not signed in" });
