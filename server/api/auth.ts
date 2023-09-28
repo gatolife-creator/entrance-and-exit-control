@@ -1,4 +1,5 @@
 import express from "express";
+import { SHA256 } from "crypto-js";
 import { adminId, members } from "./members";
 
 const router = express.Router();
@@ -74,7 +75,7 @@ const signup = (uuid: string, password: string) => {
     throw new Error("Member not found");
   }
 
-  member.password = password;
+  member.password = SHA256(password).toString();
 };
 
 const signin = (uuid: string, password: string) => {
@@ -83,7 +84,7 @@ const signin = (uuid: string, password: string) => {
     throw new Error("Member not found");
   }
 
-  if (member.password !== password) {
+  if (member.password !== SHA256(password).toString()) {
     throw new Error(`Wrong password: ${password}`);
   }
 };
