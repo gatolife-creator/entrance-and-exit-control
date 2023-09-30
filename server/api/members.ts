@@ -1,26 +1,29 @@
 import express from "express";
-// @ts-ignore
-import session from "express-session";
-import { v4 as uuidv4 } from "uuid";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 const router = express.Router();
 
-declare module "express-session" {
-  export interface SessionData {
-    member: string;
-  }
-}
-
 export type Member = {
   id: string;
   name: string;
   age: number;
-  gender: string;
+  gender: "male" | "female";
   role: "member" | "admin";
   password?: string;
+  history: {
+    [date: string]: {
+      enter: {
+        status?: boolean;
+        timestamp?: number;
+      };
+      exit: {
+        status?: boolean;
+        timestamp?: number;
+      };
+    };
+  };
 };
 
 // Init admin info
@@ -33,6 +36,7 @@ export const members: Member[] = [
     gender: "female",
     role: "admin",
     password: process.env.ADMIN_PASSWORD,
+    history: {},
   },
 ];
 
@@ -40,7 +44,7 @@ router.use(express.json());
 
 router.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (!req.session.member) {
+    if (!req.session.uuid) {
       res.status(401).json({ message: "Unauthorized" });
     } else {
       next();

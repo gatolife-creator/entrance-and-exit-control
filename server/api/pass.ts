@@ -1,29 +1,33 @@
+import express from "express";
 import { members } from "./members";
 
-type Pass = {
-  code: number;
-  timestamp: number;
+const router = express.Router();
+
+router.post("/enter", (req: express.Request, res: express.Response) => {
+  const { uuid } = req.body;
+});
+
+const JST = () => {
+  const date = new Date();
+  date.setTime(
+    date.getTime() + (date.getTimezoneOffset() + 9 * 60) * 60 * 1000
+  );
+
+  const yyyy = date.getFullYear();
+  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+  const dd = date.getDate().toString().padStart(2, "0");
+
+  return `${yyyy}/${mm}/${dd}`;
 };
 
-const passes: { [id: string]: Pass } = {};
+// const enter = (uuid: string) => {
+//   for (const member of members) {
+//     if (member.id === uuid) {
+//       if (member.history.hasOwnProperty(JST())) {
+//       }
+//       break;
+//     }
+//   }
+// };
 
-const random = (min: number, max: number) => Math.random() * (max - min) + min;
-
-const genPass = (uuid: string) => {
-  const pass = { code: Math.floor(random(0, 999999)), timestamp: Date.now() };
-  passes[uuid] = pass;
-  return pass;
-};
-
-const checkPass = (uuid: string, code: number) => {
-  const pass = passes[uuid];
-  if (!pass) {
-    return false;
-  }
-  if (Date.now() - pass.timestamp < 30000) {
-    return false;
-  }
-  if (pass.code === code) {
-    return true;
-  }
-};
+// const exit = (uuid: string) => {};

@@ -1,9 +1,16 @@
 import express from "express";
+import _ from "express-session";
 import { v4 as uuidv4 } from "uuid";
 
 import { Member, members } from "./members";
 
 const router = express.Router();
+
+declare module "express-session" {
+  export interface SessionData {
+    uuid: string;
+  }
+}
 
 router.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -53,6 +60,7 @@ const add = (name: string, age: number, gender: "male" | "female") => {
     age,
     gender,
     role: "member",
+    history: {},
   } as Member;
   members.push(newMember);
   return id;
