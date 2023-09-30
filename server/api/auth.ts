@@ -4,12 +4,6 @@ import { adminId, members } from "./members";
 
 const router = express.Router();
 
-declare module "express-session" {
-  export interface SessionData {
-    uuid: string;
-  }
-}
-
 router.post("/signup", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
   try {

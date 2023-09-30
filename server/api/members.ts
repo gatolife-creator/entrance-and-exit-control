@@ -1,9 +1,16 @@
 import express from "express";
+import _ from "express-session";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 const router = express.Router();
+
+declare module "express-session" {
+  export interface SessionData {
+    uuid: string;
+  }
+}
 
 export type Member = {
   id: string;
