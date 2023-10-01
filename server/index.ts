@@ -6,6 +6,7 @@ import * as dotenv from "dotenv";
 import { router as membersRouter } from "./api/members";
 import { router as adminRouter } from "./api/admin";
 import { router as authRouter } from "./api/auth";
+import { router as passRouter } from "./api/pass";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(session(session_option));
 app.use("/api/members", membersRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/pass", passRouter);
 
 app.get("*", (req: express.Request, res: express.Response) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));

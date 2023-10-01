@@ -1,10 +1,26 @@
 import express from "express";
-import { members } from "./members";
+import { Member, members } from "./members";
 
 const router = express.Router();
 
-router.post("/enter", (req: express.Request, res: express.Response) => {
+router.post("/scan", (req: express.Request, res: express.Response) => {
   const { uuid } = req.body;
+  const member = members.find((member) => member.id === uuid);
+
+  if (!member) {
+    res.status(401).json({ message: `The member ${uuid} not found` });
+  } else {
+    if (!member.history.hasOwnProperty(JST())) {
+      member.history = { [JST()]: { enter: {}, exit: {} } };
+      enter(member);
+      res.status(200).json({ message: `The member ${uuid} entered` });
+    } else if (member.history[JST()].exit.status === false) {
+      exit(member);
+      res.status(200).json({ message: `The member ${uuid} exited` });
+    } else {
+      res.status(200).json({ message: "Already exited" });
+    }
+  }
 });
 
 const JST = () => {
@@ -20,14 +36,13 @@ const JST = () => {
   return `${yyyy}/${mm}/${dd}`;
 };
 
-// const enter = (uuid: string) => {
-//   for (const member of members) {
-//     if (member.id === uuid) {
-//       if (member.history.hasOwnProperty(JST())) {
-//       }
-//       break;
-//     }
-//   }
-// };
+const enter = (member: Member) => {
+  member.history[JST()]["enter"] = { status: true, timestamp: Date.now() };
+  member.history[JST()]["exit"] = { status: false, timestamp: NaN };
+};
 
-// const exit = (uuid: string) => {};
+const exit = (member: Member) => {
+  member.history[JST()].exit = { status: true, timestamp: Date.now() };
+};
+
+export { router };
