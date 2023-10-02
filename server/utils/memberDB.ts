@@ -1,0 +1,58 @@
+import { v4 as uuidv4 } from "uuid";
+import { Member } from "./member";
+
+export class MemberDB {
+  private members: Map<string, Member>;
+  constructor(members?: Map<string, Member>) {
+    this.members = members || new Map<string, Member>();
+  }
+
+  add(member: Member) {
+    const uuid = uuidv4();
+    this.members.set(uuid, member);
+    return uuid;
+  }
+
+  delete(uuid: string) {
+    this.members.delete(uuid);
+  }
+
+  getMember(uuid: string) {
+    return this.members.get(uuid);
+  }
+
+  getMembers() {
+    return Array.from(this.members);
+  }
+
+  enter(uuid: string) {
+    const member = this.members.get(uuid);
+    if (member) {
+      member.history[JST()]["enter"] = {
+        status: true,
+        timestamp: Date.now(),
+      };
+      member.history[JST()]["exit"] = { status: false, timestamp: NaN };
+    }
+  }
+
+  exit(uuid: string) {
+    const member = this.members.get(uuid);
+    if (member) {
+      member.history[JST()].exit = { status: true, timestamp: Date.now() };
+    }
+  }
+}
+
+export const JST = () => {
+  const date = new Date();
+  date.setTime(
+    date.getTime() + (date.getTimezoneOffset() + 9 * 60) * 60 * 1000
+  );
+
+  const yyyy = date.getFullYear();
+  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+  const dd = date.getDate().toString().padStart(2, "0");
+
+  return `${yyyy}/${mm}/${dd}`;
+};

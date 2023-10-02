@@ -1,6 +1,7 @@
 import express from "express";
 import { SHA256 } from "crypto-js";
-import { adminId, members } from "./members";
+import { adminId } from "./members";
+import { memberDB } from "./members";
 
 const router = express.Router();
 
@@ -51,7 +52,7 @@ router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
 
 router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
   const { uuid } = req.body;
-  const member = members.find((member) => member.id === uuid);
+  const member = memberDB.getMember(uuid);
 
   if (member === undefined) {
     res.status(401).json({ message: `The member ${uuid} was not found` });
@@ -64,7 +65,7 @@ router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
 });
 
 const signup = (uuid: string, password: string) => {
-  const member = members.find((member) => member.id === uuid);
+  const member = memberDB.getMember(uuid);
   if (!member) {
     throw new Error("Member not found");
   }
@@ -73,7 +74,7 @@ const signup = (uuid: string, password: string) => {
 };
 
 const signin = (uuid: string, password: string) => {
-  const member = members.find((member) => member.id === uuid);
+  const member = memberDB.getMember(uuid);
   if (!member) {
     throw new Error("Member not found");
   }
@@ -84,7 +85,7 @@ const signin = (uuid: string, password: string) => {
 };
 
 const signinAsAdmin = (uuid: string, password: string) => {
-  const member = members.find((member) => member.id === uuid);
+  const member = memberDB.getMember(uuid);
   if (!member) {
     throw new Error("Member not found");
   }
@@ -93,7 +94,7 @@ const signinAsAdmin = (uuid: string, password: string) => {
     throw new Error("Not an admin");
   }
 
-  if (member.password !== password) {
+  if (!member.isValidPassword(password)) {
     throw new Error(`Wrong password: ${password}`);
   }
   return true;

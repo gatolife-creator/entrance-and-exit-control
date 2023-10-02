@@ -2,6 +2,9 @@ import express from "express";
 import _ from "express-session";
 import * as dotenv from "dotenv";
 
+import { Member } from "../utils/member";
+import { MemberDB } from "../utils/memberDB";
+
 dotenv.config();
 
 const router = express.Router();
@@ -12,40 +15,18 @@ declare module "express-session" {
   }
 }
 
-export type Member = {
-  id: string;
-  name: string;
-  age: number;
-  gender: "male" | "female";
-  role: "member" | "admin";
-  password?: string;
-  history: {
-    [date: string]: {
-      enter: {
-        status?: boolean;
-        timestamp?: number;
-      };
-      exit: {
-        status?: boolean;
-        timestamp?: number;
-      };
-    };
-  };
-};
+const admin = new Member({
+  name: "管理者",
+  age: 17,
+  gender: "female",
+  role: "admin",
+});
 
-// Init admin info
-export const adminId = "db931138-7efd-403d-87eb-6cd9dd0df187";
-export const members: Member[] = [
-  {
-    id: adminId,
-    name: "管理者",
-    age: 17,
-    gender: "female",
-    role: "admin",
-    password: process.env.ADMIN_PASSWORD,
-    history: {},
-  },
-];
+admin.setPassword(process.env.ADMIN_PASSWORD as string);
+
+export const memberDB = new MemberDB();
+export const adminId = memberDB.add(admin);
+console.log("adminId: ", adminId);
 
 router.use(express.json());
 

@@ -1,8 +1,8 @@
 import express from "express";
 import _ from "express-session";
-import { v4 as uuidv4 } from "uuid";
 
-import { Member, members } from "./members";
+import { Member } from "../utils/member";
+import { memberDB } from "./members";
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.use(
     const { uuid } = req.session;
     if (!uuid) {
       res.status(401).json({ message: "Unauthorized" });
-    } else if (members.find((member) => member.id === uuid)) {
+    } else if (memberDB.getMember(uuid)) {
       next();
     } else {
       res.status(401).json({ message: "Not added as a member" });
@@ -26,48 +26,31 @@ router.use(
 );
 
 router.get("/members", (_: express.Request, res: express.Response) => {
-  res.json({ members });
+  res.json({ member: memberDB.getMembers() });
 });
 
 router.get("/profile", (req: express.Request, res: express.Response) => {
-  const { id } = req.body;
-  const member = members.find((member) => member.id === id);
-  res.json(member);
+  const { uuid } = req.body;
+  res.json(memberDB.getMember(uuid));
 });
 
 router.post("/add", (req: express.Request, res: express.Response) => {
   const { name, age, gender } = req.body;
-  const id = add(name as string, Number(age), gender as "male" | "female");
+  const member = new Member({
+    name: name as string,
+    age: Number(age),
+    gender: gender as "male" | "female",
+    role: "member",
+  });
+
+  const uuid = memberDB.add(member);
   res.json({
-    member: members.find((member) => {
-      if (member.id === id) {
-        return member;
-      }
-    }),
+    member: memberDB.getMember(uuid),
   });
 });
 
-router.delete("/remove", (req: express.Request) => {
-  const { index } = req.body;
-  remove(index);
-});
-
-const add = (name: string, age: number, gender: "male" | "female") => {
-  const id = uuidv4();
-  const newMember = {
-    id,
-    name,
-    age,
-    gender,
-    role: "member",
-    history: {},
-  } as Member;
-  members.push(newMember);
-  return id;
-};
-
-const remove = (index: number) => {
-  members.splice(index, 1);
-};
-
+// router.delete("/remove", (req: express.Request) => {
+//   const { index } = req.body;
+//   remove(index);
+// });
 export { router };
