@@ -1,4 +1,13 @@
+import { v4 as uuidv4 } from "uuid";
 import { SHA256 } from "crypto-js";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+const PEPPER = process.env.PEPPER;
+
+if (!PEPPER) {
+  console.error("PEPPER is undefined");
+}
 
 export type MemberType = {
   name: string;
@@ -6,6 +15,7 @@ export type MemberType = {
   gender: "male" | "female";
   role: "member" | "admin";
   password: string;
+  salt: string;
   history: {
     [date: string]: {
       enter: {
@@ -25,7 +35,8 @@ export class Member {
   age: number;
   gender: "male" | "female";
   role: "member" | "admin";
-  password: string | null;
+  private password: string | null;
+  private salt: string | null;
   history: {
     [date: string]: {
       enter: {
@@ -39,20 +50,36 @@ export class Member {
     };
   };
 
-  constructor(init: Omit<MemberType, "password" | "history">) {
+  constructor(init: Omit<MemberType, "password" | "salt" | "history">) {
     this.name = init.name;
     this.age = init.age;
     this.gender = init.gender;
     this.role = init.role;
     this.history = {};
     this.password = null;
+    this.salt = null;
   }
 
   setPassword(password: string) {
-    this.password = SHA256(password).toString();
+    this.salt = uuidv4();
+    this.password = Member.stretch(password + this.salt + PEPPER).toString();
+  }
+
+  getPassword() {
+    return this.password;
   }
 
   isValidPassword(password: string) {
-    return this.password === SHA256(password).toString();
+    return (
+      this.password === Member.stretch(password + this.salt + PEPPER).toString()
+    );
+  }
+
+  static stretch(message: string) {
+    let hash = message;
+    for (let i = 0; i < 10000; i++) {
+      hash = SHA256(hash).toString();
+    }
+    return hash;
   }
 }

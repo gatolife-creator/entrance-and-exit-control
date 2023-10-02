@@ -92,7 +92,7 @@ export class MemberDB {
     if (!this.isExist(uuid)) {
       throw new Error(`The member ${uuid} is not exist`);
     }
-    if (this.getMember(uuid)?.password) {
+    if (this.getMember(uuid)?.getPassword()) {
       return true;
     } else {
       return false;

@@ -68,7 +68,9 @@ const signup = (uuid: string, password: string) => {
 };
 
 const signin = (uuid: string, password: string) => {
-  memberDB.isValidPassword(uuid, password);
+  if (!memberDB.isValidPassword(uuid, password)) {
+    throw new Error(`Wrong password: ${password}`);
+  }
 };
 
 const signinAsAdmin = (uuid: string, password: string) => {
