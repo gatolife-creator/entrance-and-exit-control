@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { Member } from "./member";
+import { MemberType } from "./member";
+
+type SerializedMemberType = Omit<MemberType, "password" | "salt">;
 
 export class MemberDB {
   private members: Map<string, Member>;
@@ -22,7 +25,7 @@ export class MemberDB {
   }
 
   getMembers() {
-    return Array.from(this.members);
+    return this.members;
   }
 
   historyInitToday(uuid: string) {
@@ -111,6 +114,22 @@ export class MemberDB {
       throw new Error(`The member ${uuid} is not exist`);
     }
     return this.getMember(uuid)?.isValidPassword(password);
+  }
+
+  serialize() {
+    const members = this.getMembers();
+    const serialized: { [id: string]: SerializedMemberType } = {};
+
+    members.forEach((member, id) => {
+      serialized[id] = {
+        name: member.name,
+        age: member.age,
+        gender: member.gender,
+        role: member.role,
+        history: member.history,
+      };
+    });
+    return serialized;
   }
 }
 

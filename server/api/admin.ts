@@ -26,7 +26,7 @@ router.use(
 );
 
 router.get("/members", (_: express.Request, res: express.Response) => {
-  res.json({ member: memberDB.getMembers() });
+  res.json({ member: memberDB.serialize() });
 });
 
 router.get("/profile", (req: express.Request, res: express.Response) => {
