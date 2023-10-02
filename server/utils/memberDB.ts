@@ -25,8 +25,37 @@ export class MemberDB {
     return Array.from(this.members);
   }
 
+  historyInitToday(uuid: string) {
+    const member = this.getMember(uuid);
+    const date = JST();
+    if (!member) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    if (!member.history.hasOwnProperty(date)) {
+      member.history = { [date]: { enter: {}, exit: {} } };
+    }
+  }
+
+  isEnteredToday(uuid: string) {
+    const member = this.getMember(uuid);
+    const date = JST();
+    if (!member) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    return member.history[date].enter.status;
+  }
+
+  isExitedToday(uuid: string) {
+    const member = this.getMember(uuid);
+    const date = JST();
+    if (!member) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    return member.history[date].exit.status;
+  }
+
   enter(uuid: string) {
-    const member = this.members.get(uuid);
+    const member = this.getMember(uuid);
     if (member) {
       member.history[JST()]["enter"] = {
         status: true,
@@ -37,7 +66,7 @@ export class MemberDB {
   }
 
   exit(uuid: string) {
-    const member = this.members.get(uuid);
+    const member = this.getMember(uuid);
     if (member) {
       member.history[JST()].exit = { status: true, timestamp: Date.now() };
     }
