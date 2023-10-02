@@ -1,6 +1,5 @@
 import express from "express";
 import { memberDB } from "./members";
-import { JST } from "../utils/memberDB";
 
 const router = express.Router();
 

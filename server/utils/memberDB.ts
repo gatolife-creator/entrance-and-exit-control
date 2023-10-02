@@ -73,7 +73,7 @@ export class MemberDB {
   }
 }
 
-export const JST = () => {
+const JST = () => {
   const date = new Date();
   date.setTime(
     date.getTime() + (date.getTimezoneOffset() + 9 * 60) * 60 * 1000
