@@ -1,5 +1,4 @@
 import express from "express";
-import { SHA256 } from "crypto-js";
 import { adminId } from "./members";
 import { memberDB } from "./members";
 
@@ -37,8 +36,9 @@ router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
     req.session.uuid = adminId;
     res.sendStatus(200);
   } catch (e) {
-    console.log(e);
-    res.status(401).json({ message: "Wrong password" });
+    if (e instanceof Error) {
+      res.status(401).json({ message: e.message });
+    }
   }
 });
 
@@ -52,11 +52,10 @@ router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
 
 router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
   const { uuid } = req.body;
-  const member = memberDB.getMember(uuid);
 
-  if (member === undefined) {
+  if (!memberDB.isExist(uuid)) {
     res.status(401).json({ message: `The member ${uuid} was not found` });
-  } else if (member.password === undefined) {
+  } else if (!memberDB.isPasswordSetUp(uuid)) {
     res.status(401).json({ message: "Not signed up yet" });
   } else {
     res.sendStatus(200);
@@ -65,39 +64,21 @@ router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
 });
 
 const signup = (uuid: string, password: string) => {
-  const member = memberDB.getMember(uuid);
-  if (!member) {
-    throw new Error("Member not found");
-  }
-
-  member.password = SHA256(password).toString();
+  memberDB.setPassword(uuid, password);
 };
 
 const signin = (uuid: string, password: string) => {
-  const member = memberDB.getMember(uuid);
-  if (!member) {
-    throw new Error("Member not found");
-  }
-
-  if (member.password !== SHA256(password).toString()) {
-    throw new Error(`Wrong password: ${password}`);
-  }
+  memberDB.isValidPassword(uuid, password);
 };
 
 const signinAsAdmin = (uuid: string, password: string) => {
-  const member = memberDB.getMember(uuid);
-  if (!member) {
-    throw new Error("Member not found");
-  }
-
-  if (member.role !== "admin") {
+  if (!memberDB.isAdmin(uuid)) {
     throw new Error("Not an admin");
   }
 
-  if (!member.isValidPassword(password)) {
+  if (!memberDB.isValidPassword(uuid, password)) {
     throw new Error(`Wrong password: ${password}`);
   }
-  return true;
 };
 
 export { router };

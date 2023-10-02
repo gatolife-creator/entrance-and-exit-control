@@ -1,12 +1,11 @@
 import { SHA256 } from "crypto-js";
 
 export type MemberType = {
-  //   id: string;
   name: string;
   age: number;
   gender: "male" | "female";
   role: "member" | "admin";
-  password?: string;
+  password: string;
   history: {
     [date: string]: {
       enter: {
@@ -26,7 +25,7 @@ export class Member {
   age: number;
   gender: "male" | "female";
   role: "member" | "admin";
-  password?: string;
+  password: string | null;
   history: {
     [date: string]: {
       enter: {
@@ -46,6 +45,7 @@ export class Member {
     this.gender = init.gender;
     this.role = init.role;
     this.history = {};
+    this.password = null;
   }
 
   setPassword(password: string) {

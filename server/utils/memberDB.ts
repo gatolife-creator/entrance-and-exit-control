@@ -71,6 +71,47 @@ export class MemberDB {
       member.history[JST()].exit = { status: true, timestamp: Date.now() };
     }
   }
+
+  isExist(uuid: string) {
+    const member = this.getMember(uuid);
+    if (member) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isAdmin(uuid: string) {
+    if (!this.isExist(uuid)) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    return this.getMember(uuid)?.role === "admin";
+  }
+
+  isPasswordSetUp(uuid: string) {
+    if (!this.isExist(uuid)) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    if (this.getMember(uuid)?.password) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  setPassword(uuid: string, password: string) {
+    if (!this.isExist(uuid)) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    this.getMember(uuid)?.setPassword(password);
+  }
+
+  isValidPassword(uuid: string, password: string) {
+    if (!this.isExist(uuid)) {
+      throw new Error(`The member ${uuid} is not exist`);
+    }
+    return this.getMember(uuid)?.isValidPassword(password);
+  }
 }
 
 const JST = () => {

@@ -3,7 +3,6 @@ import { memberDB } from "./members";
 
 const router = express.Router();
 
-// NOTE historyの初期化と、特定の日の入退室履歴の有無確認はMemberDBに移植
 router.post("/scan", (req: express.Request, res: express.Response) => {
   const { uuid } = req.body;
   if (!memberDB.getMember(uuid)) {

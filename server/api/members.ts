@@ -22,11 +22,11 @@ const admin = new Member({
   role: "admin",
 });
 
-admin.setPassword(process.env.ADMIN_PASSWORD as string);
-
 export const memberDB = new MemberDB();
 export const adminId = memberDB.add(admin);
 console.log("adminId: ", adminId);
+
+memberDB.setPassword(adminId, process.env.ADMIN_PASSWORD as string);
 
 router.use(express.json());
 
