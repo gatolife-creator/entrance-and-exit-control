@@ -10,6 +10,10 @@ export class MemberDB {
     this.members = members || new Map<string, Member>();
   }
 
+  addSpecifiedMember(uuid: string, member: Member) {
+    this.members.set(uuid, member);
+  }
+
   add(member: Member) {
     const uuid = uuidv4();
     this.members.set(uuid, member);
