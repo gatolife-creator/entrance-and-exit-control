@@ -26,7 +26,7 @@ router.use(
 );
 
 router.get("/members", (_: express.Request, res: express.Response) => {
-  res.json({ member: memberDB.serialize() });
+  res.json({ members: memberDB.serialize() });
 });
 
 router.get("/profile", (req: express.Request, res: express.Response) => {
@@ -44,9 +44,7 @@ router.post("/add", (req: express.Request, res: express.Response) => {
   });
 
   const uuid = memberDB.add(member);
-  res.json({
-    member: memberDB.getMember(uuid),
-  });
+  res.status(200).json([uuid, member.serialize()]);
 });
 
 // router.delete("/remove", (req: express.Request) => {

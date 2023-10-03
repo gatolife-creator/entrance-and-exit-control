@@ -30,6 +30,8 @@ export type MemberType = {
   };
 };
 
+export type SerializedMemberType = Omit<MemberType, "password" | "salt">;
+
 export class Member {
   name: string;
   age: number;
@@ -73,6 +75,16 @@ export class Member {
     return (
       this.password === Member.stretch(password + this.salt + PEPPER).toString()
     );
+  }
+
+  serialize(): SerializedMemberType {
+    return {
+      name: this.name,
+      age: this.age,
+      gender: this.gender,
+      role: this.role,
+      history: this.history,
+    };
   }
 
   static stretch(message: string) {

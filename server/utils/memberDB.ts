@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Member } from "./member";
-import { MemberType } from "./member";
-
-type SerializedMemberType = Omit<MemberType, "password" | "salt">;
+import { SerializedMemberType } from "./member";
 
 export class MemberDB {
   private members: Map<string, Member>;
@@ -122,16 +120,10 @@ export class MemberDB {
 
   serialize() {
     const members = this.getMembers();
-    const serialized: { [id: string]: SerializedMemberType } = {};
+    const serialized: [string, SerializedMemberType][] = [];
 
     members.forEach((member, id) => {
-      serialized[id] = {
-        name: member.name,
-        age: member.age,
-        gender: member.gender,
-        role: member.role,
-        history: member.history,
-      };
+      serialized.push([id, member.serialize()]);
     });
     return serialized;
   }
