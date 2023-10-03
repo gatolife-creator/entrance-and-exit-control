@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export const useSignIn = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const notify = () =>
+    toast.error("Fail to sign in", { position: "bottom-right" });
 
   useEffect(() => {
     checkIfSignedIn();
@@ -35,6 +38,8 @@ export const useSignIn = () => {
 
     if (res.status === 200) {
       setIsSignedIn(true);
+    } else if (res.status === 401) {
+      notify();
     }
   };
 

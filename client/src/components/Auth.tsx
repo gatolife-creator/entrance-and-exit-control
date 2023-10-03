@@ -10,7 +10,6 @@ type Props = {
 
 export const Auth = (props: Props) => {
   const [uuid, setUuid] = useState("");
-  const [password, setPassword] = useState("");
   const [isReaderOn, setIsReaderOn] = useState(false);
   const [isRead, setIsRead] = useState(false);
 
@@ -23,6 +22,7 @@ export const Auth = (props: Props) => {
 
   const signUpHandler = async (e: FormEvent) => {
     e.preventDefault();
+    const password = (e.target as HTMLFormElement).password.value;
     await signUp(uuid, password);
   };
 
