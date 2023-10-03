@@ -23,7 +23,7 @@ export const Auth = (props: Props) => {
 
   const signUpHandler = async (e: FormEvent) => {
     e.preventDefault();
-    signUp(uuid, password);
+    await signUp(uuid, password);
   };
 
   const signInHandler = async (e: FormEvent) => {

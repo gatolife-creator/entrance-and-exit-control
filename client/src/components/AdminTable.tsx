@@ -2,35 +2,10 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useMembers } from "../hooks/useMembers";
 
 export const AdminTable = () => {
-  const { members, setMembers } = useMembers();
+  const { members, addMember } = useMembers();
   const [name, setName] = useState("");
   const [age, setAge] = useState(NaN);
   const [gender, setGender] = useState<"male" | "female">("male");
-
-  const addMember = async (
-    name: string,
-    age: number,
-    gender: "male" | "female"
-  ) => {
-    const res = await fetch("/api/members/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        age,
-        gender,
-      }),
-    });
-    const data = await res.json();
-
-    if (res.status === 200) {
-      setMembers([...members, data.member]);
-    } else {
-      console.log(data.message);
-    }
-  };
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
@@ -56,7 +31,7 @@ export const AdminTable = () => {
           </tr>
         </thead>
         <tbody>
-          {members.map((member, index) => (
+          {members.map(([, member], index) => (
             <tr key={index}>
               <th>
                 <label>
