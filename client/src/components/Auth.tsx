@@ -26,8 +26,9 @@ export const Auth = (props: Props) => {
     await signUp(uuid, password);
   };
 
-  const signInHandler = async (e: FormEvent) => {
+  const signInHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const password = (e.target as HTMLFormElement).password.value;
     await signIn(uuid, password);
   };
 
@@ -74,24 +75,23 @@ export const Auth = (props: Props) => {
                   <div className="relative mb-6">
                     <input
                       type="text"
+                      name="id"
                       className="input input-bordered w-full max-w-xs"
                       id="id"
                       placeholder="id"
                       defaultValue={uuid}
-                      onChange={(e) => setUuid(e.target.value)}
-                      // hidden
+                      hidden
                     />
                   </div>
 
                   <div className="relative mb-6">
                     <input
                       type="password"
+                      name="password"
                       className="input input-bordered w-full max-w-xs"
                       id="password"
                       autoComplete="true"
                       placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
 
@@ -122,7 +122,7 @@ export const Auth = (props: Props) => {
                       placeholder="id"
                       defaultValue={uuid}
                       onChange={(e) => setUuid(e.target.value)}
-                      // hidden
+                      hidden
                     />
                   </div>
 
@@ -133,8 +133,6 @@ export const Auth = (props: Props) => {
                       id="password"
                       autoComplete="true"
                       placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
                   {/* <div className="reactive mb-6" data-to-input-wrapper-init>
