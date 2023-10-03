@@ -1,5 +1,8 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { QrReader } from "react-qr-reader";
+
+import { useSignUp } from "../hooks/useSignUp";
+import { useSignIn } from "../hooks/useSignIn";
 
 type Props = {
   children?: React.ReactNode;
@@ -10,45 +13,22 @@ export const Auth = (props: Props) => {
   const [password, setPassword] = useState("");
   const [isReaderOn, setIsReaderOn] = useState(false);
   const [isRead, setIsRead] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    checkIfSignedIn();
-  }, []);
+  const { isSignedUp, checkIfSignedUp, signUp } = useSignUp();
+  const { isSignedIn, signIn } = useSignIn();
 
   const clickHandler = () => {
     setIsReaderOn(true);
   };
 
-  const submitHandler = async (e: FormEvent) => {
+  const signUpHandler = async (e: FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/auth/signinAsAdmin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uuid,
-        password,
-      }),
-    });
-
-    if (res.status === 200) {
-      setIsAuthenticated(true);
-    }
+    signUp(uuid, password);
   };
 
-  const checkIfSignedIn = async () => {
-    const res = await fetch("/api/auth/isSignedIn", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (res.status === 200) {
-      setIsAuthenticated(true);
-    }
+  const signInHandler = async (e: FormEvent) => {
+    e.preventDefault();
+    await signIn(uuid, password);
   };
 
   const PasswordForm = () => {
@@ -59,7 +39,7 @@ export const Auth = (props: Props) => {
             {!isRead && isReaderOn && (
               <>
                 <QrReader
-                  onResult={async (result) => {
+                  onResult={(result) => {
                     if (result) {
                       navigator.mediaDevices
                         .getUserMedia({
@@ -73,6 +53,7 @@ export const Auth = (props: Props) => {
                           });
                         });
                       setIsRead(true);
+                      checkIfSignedUp(result.getText());
                       setUuid(result.getText());
                     }
                   }}
@@ -85,32 +66,87 @@ export const Auth = (props: Props) => {
                 Read QRCode
               </button>
             )}
-            {isRead && (
+            {isRead && isSignedUp && (
               <>
-                <form onSubmit={submitHandler}>
+                <form onSubmit={signInHandler}>
                   <h1 className="text-2xl">Successfully scanned!</h1>
                   <p className="text-lg">Please complete your password.</p>
-                  <div className="relative mb-6" data-te-input-wrapper-init>
+                  <div className="relative mb-6">
                     <input
                       type="text"
                       className="input input-bordered w-full max-w-xs"
                       id="id"
                       placeholder="id"
                       defaultValue={uuid}
-                      hidden
+                      onChange={(e) => setUuid(e.target.value)}
+                      // hidden
                     />
                   </div>
 
-                  <div className="relative mb-6" data-te-input-wrapper-init>
+                  <div className="relative mb-6">
                     <input
                       type="password"
                       className="input input-bordered w-full max-w-xs"
                       id="password"
                       autoComplete="true"
                       placeholder="Password"
+                      value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
+
+                  <div className="text-center">
+                    <button
+                      type="submit"
+                      className="btn btn-success"
+                      data-te-ripple-init
+                      data-te-ripple-color="light"
+                    >
+                      Login
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {isRead && !isSignedUp && (
+              <>
+                <form onSubmit={signUpHandler}>
+                  <h1 className="text-2xl">Successfully scanned!</h1>
+                  <p className="text-lg">Please set up your password first.</p>
+                  <div className="relative mb-6">
+                    <input
+                      type="text"
+                      className="input input-bordered w-full max-w-xs"
+                      id="id"
+                      placeholder="id"
+                      defaultValue={uuid}
+                      onChange={(e) => setUuid(e.target.value)}
+                      // hidden
+                    />
+                  </div>
+
+                  <div className="relative mb-6">
+                    <input
+                      type="password"
+                      className="input input-bordered w-full max-w-xs"
+                      id="password"
+                      autoComplete="true"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  {/* <div className="reactive mb-6" data-to-input-wrapper-init>
+                    <input
+                      type="password"
+                      className="input input-bordered w-full max-w-xs"
+                      id="password-confirm"
+                      autoComplete="false"
+                      placeholder="Password confirmation"
+                      onChange={(e) => setPasswordConfirm(e.target.value)}
+                    />
+                  </div> */}
 
                   <div className="text-center">
                     <button
@@ -133,8 +169,8 @@ export const Auth = (props: Props) => {
 
   return (
     <>
-      {!isAuthenticated && <PasswordForm />}
-      {isAuthenticated && props.children}
+      {!isSignedIn && <PasswordForm />}
+      {isSignedIn && props.children}
     </>
   );
 };

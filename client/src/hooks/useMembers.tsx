@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Member } from "../../../server/api/members";
+import { Member } from "../../../server/utils/member";
 
 export const useMembers = () => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -18,7 +18,7 @@ export const useMembers = () => {
 
     const data = await res.json();
     if (res.status === 200) {
-      setMembers(data.members);
+      setMembers(Array.from(data.members));
     } else {
       console.error(data.message);
     }
