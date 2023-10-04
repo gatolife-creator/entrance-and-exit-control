@@ -1,6 +1,7 @@
 import express from "express";
 import _ from "express-session";
 import * as dotenv from "dotenv";
+import QRCode from "qrcode";
 
 import { Member } from "../utils/member";
 import { MemberDB } from "../utils/memberDB";
@@ -27,6 +28,18 @@ export const adminId = "db931138-7efd-403d-87eb-6cd9dd0df187";
 memberDB.addSpecifiedMember(adminId, admin);
 
 memberDB.setPassword(adminId, process.env.ADMIN_PASSWORD as string);
+
+const dummy = new Member({
+  name: "dummy",
+  age: 16,
+  gender: "male",
+  role: "member",
+});
+const dummyId = "d7af6d37-dc7a-4ae6-b093-17a93198b355";
+memberDB.addSpecifiedMember(dummyId, dummy);
+
+QRCode.toFile("resources/admin.png", adminId);
+QRCode.toFile("resources/dummy.png", dummyId);
 
 router.use(express.json());
 
