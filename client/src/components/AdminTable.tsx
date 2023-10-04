@@ -67,8 +67,11 @@ export const AdminTable = () => {
 
       <button
         className="btn btn-success"
-        // @ts-ignore
-        onClick={() => document.getElementById("my_modal_1").showModal()}
+        onClick={() =>
+          (
+            document.getElementById("my_modal_1") as HTMLDialogElement
+          ).showModal()
+        }
       >
         部員追加
       </button>
