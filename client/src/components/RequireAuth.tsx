@@ -14,7 +14,7 @@ export const RequireAuth = (props: Props) => {
   const [isRead, setIsRead] = useState(false);
 
   const { isSignedUp, checkIfSignedUp, signUp } = useSignUp();
-  const { isSignedIn, signIn } = useSignIn();
+  const { processing, isSignedIn, signIn } = useSignIn();
 
   const clickHandler = () => {
     setIsReaderOn(true);
@@ -169,8 +169,8 @@ export const RequireAuth = (props: Props) => {
 
   return (
     <>
-      {!isSignedIn && <PasswordForm />}
-      {isSignedIn && props.children}
+      {!processing && !isSignedIn && <PasswordForm />}
+      {!processing && isSignedIn && props.children}
     </>
   );
 };

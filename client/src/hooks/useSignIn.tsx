@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 export const useSignIn = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const notify = () =>
     toast.error("Fail to sign in", { position: "bottom-right" });
 
@@ -11,6 +12,7 @@ export const useSignIn = () => {
   }, []);
 
   const checkIfSignedIn = async () => {
+    setProcessing(true);
     const res = await fetch("/api/auth/isSignedIn", {
       method: "POST",
       headers: {
@@ -21,10 +23,11 @@ export const useSignIn = () => {
     if (res.status === 200) {
       setIsSignedIn(true);
     }
+    setProcessing(false);
   };
 
   const signIn = async (uuid: string, password: string) => {
-    console.log("signin");
+    setProcessing(true);
     const res = await fetch("/api/auth/signin", {
       method: "POST",
       headers: {
@@ -41,7 +44,8 @@ export const useSignIn = () => {
     } else if (res.status === 401) {
       notify();
     }
+    setProcessing(false);
   };
 
-  return { isSignedIn, signIn };
+  return { processing, isSignedIn, signIn };
 };
