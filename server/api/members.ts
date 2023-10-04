@@ -53,4 +53,14 @@ router.use(
   }
 );
 
+router.get("/isAdmin", (req: express.Request, res: express.Response) => {
+  const uuid = req.session.uuid as string;
+  const isAdmin = memberDB.isAdmin(uuid);
+  if (isAdmin) {
+    res.sendStatus(200);
+  } else {
+    res.status(401).json({ message: `The member ${uuid} is not an admin` });
+  }
+});
+
 export { router };

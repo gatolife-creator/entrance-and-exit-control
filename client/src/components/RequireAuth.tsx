@@ -8,7 +8,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-export const Auth = (props: Props) => {
+export const RequireAuth = (props: Props) => {
   const [uuid, setUuid] = useState("");
   const [isReaderOn, setIsReaderOn] = useState(false);
   const [isRead, setIsRead] = useState(false);

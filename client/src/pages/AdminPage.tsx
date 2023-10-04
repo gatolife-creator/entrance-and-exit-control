@@ -1,13 +1,16 @@
 import { AdminTable } from "../components/AdminTable";
-import { Auth } from "../components/Auth";
+import { RequireAuth } from "../components/RequireAuth";
 import { Main } from "../components/Main";
+import { RequireAdmin } from "../components/RequireAdmin";
 
 export const AdminPage = () => {
   return (
     <Main>
-      <Auth>
-        <AdminTable />
-      </Auth>
+      <RequireAuth>
+        <RequireAdmin>
+          <AdminTable />
+        </RequireAdmin>
+      </RequireAuth>
     </Main>
   );
 };

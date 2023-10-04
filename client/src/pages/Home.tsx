@@ -1,11 +1,11 @@
-import { Auth } from "../components/Auth";
+import { RequireAuth } from "../components/RequireAuth";
 import { Main } from "../components/Main";
 
 export const Home = () => {
   return (
     <>
       <Main>
-        <Auth>TOP PAGE</Auth>
+        <RequireAuth>TOP PAGE</RequireAuth>
       </Main>
     </>
   );
