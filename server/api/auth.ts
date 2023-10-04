@@ -8,6 +8,7 @@ router.post("/signup", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
   try {
     signup(uuid, password);
+    req.session.uuid = uuid;
     res.sendStatus(200);
   } catch (e) {
     if (e instanceof Error) {
@@ -20,6 +21,7 @@ router.post("/signin", (req: express.Request, res: express.Response) => {
   const { uuid, password } = req.body;
   try {
     signin(uuid, password);
+    req.session.uuid = uuid;
     res.sendStatus(200);
   } catch (e) {
     if (e instanceof Error) {

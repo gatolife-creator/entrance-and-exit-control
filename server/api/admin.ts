@@ -15,12 +15,13 @@ declare module "express-session" {
 router.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { uuid } = req.session;
+    console.log(uuid);
     if (!uuid) {
       res.status(401).json({ message: "Unauthorized" });
-    } else if (memberDB.getMember(uuid)) {
+    } else if (memberDB.isAdmin(uuid)) {
       next();
     } else {
-      res.status(401).json({ message: "Not added as a member" });
+      res.status(401).json({ message: "Not added as an admin" });
     }
   }
 );

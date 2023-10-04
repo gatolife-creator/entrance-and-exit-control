@@ -117,6 +117,7 @@ export const Auth = (props: Props) => {
                   <div className="relative mb-6">
                     <input
                       type="text"
+                      name="id"
                       className="input input-bordered w-full max-w-xs"
                       id="id"
                       placeholder="id"
@@ -129,6 +130,7 @@ export const Auth = (props: Props) => {
                   <div className="relative mb-6">
                     <input
                       type="password"
+                      name="password"
                       className="input input-bordered w-full max-w-xs"
                       id="password"
                       autoComplete="true"
@@ -153,7 +155,7 @@ export const Auth = (props: Props) => {
                       data-te-ripple-init
                       data-te-ripple-color="light"
                     >
-                      Login
+                      Sign up
                     </button>
                   </div>
                 </form>

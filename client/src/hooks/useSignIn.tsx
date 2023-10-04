@@ -25,7 +25,7 @@ export const useSignIn = () => {
 
   const signIn = async (uuid: string, password: string) => {
     console.log("signin");
-    const res = await fetch("/api/auth/signinAsAdmin", {
+    const res = await fetch("/api/auth/signin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
