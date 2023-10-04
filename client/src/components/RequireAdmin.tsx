@@ -33,9 +33,7 @@ export const RequireAdmin = (props: Props) => {
     <>
       {isAdmin && props.children}
       {!processing && !isAdmin && (
-        <div className="container">
-          <p>Admin privilege is required to view this page.</p>
-        </div>
+        <p>Admin privilege is required to view this page.</p>
       )}
       {processing && <Processing />}
     </>

@@ -40,7 +40,7 @@ export const Navbar = () => {
         </div>
         <div className="navbar-center">
           <Link to="/" className="btn btn-ghost normal-case text-xl">
-            daisyUI
+            MetaNuts 🥜
           </Link>
         </div>
         <div className="navbar-end">
