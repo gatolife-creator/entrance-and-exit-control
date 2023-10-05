@@ -1,23 +1,108 @@
 import { FormEvent, useState } from "react";
 import { QrReader } from "react-qr-reader";
-
 import { useSignUp } from "../hooks/useSignUp";
 import { useSignIn } from "../hooks/useSignIn";
+import { useSetRecoilState } from "recoil";
+import { uuidState } from "../utils/atom";
 
 type Props = {
   children?: React.ReactNode;
 };
 
-export const RequireAuth = (props: Props) => {
-  const [uuid, setUuid] = useState("");
+const QRCodeReader = ({ onRead }: { onRead: (result: string) => void }) => {
   const [isReaderOn, setIsReaderOn] = useState(false);
-  const [isRead, setIsRead] = useState(false);
-
-  const { isSignedUp, checkIfSignedUp, signUp } = useSignUp();
-  const { processing, isSignedIn, signIn } = useSignIn();
 
   const clickHandler = () => {
     setIsReaderOn(true);
+  };
+
+  return (
+    <>
+      {!isReaderOn && (
+        <button className="btn btn-primary mt-5" onClick={clickHandler}>
+          Read QRCode
+        </button>
+      )}
+      {isReaderOn && (
+        <QrReader
+          onResult={(result) => {
+            if (result) {
+              setIsReaderOn(false);
+              onRead(result.getText());
+            }
+          }}
+          constraints={{ facingMode: undefined }}
+        />
+      )}
+    </>
+  );
+};
+
+const AuthForm = ({
+  uuid,
+  isSignedUp,
+  signInHandler,
+  signUpHandler,
+}: {
+  uuid: string;
+  isRead: boolean;
+  isSignedUp: boolean;
+  signInHandler: (e: React.FormEvent<HTMLFormElement>) => void;
+  signUpHandler: (e: React.FormEvent<HTMLFormElement>) => void;
+}) => {
+  const setUuid = useSetRecoilState(uuidState);
+  return (
+    <form onSubmit={(e) => (isSignedUp ? signInHandler(e) : signUpHandler(e))}>
+      <h1 className="text-2xl">Successfully scanned!</h1>
+      <p className="text-lg">
+        Please {isSignedUp ? "complete your" : "set up your"} password.
+      </p>
+      <div className="relative mb-6">
+        <input
+          type="text"
+          name="id"
+          className="input input-bordered w-full max-w-xs"
+          id="id"
+          placeholder="id"
+          defaultValue={uuid}
+          onChange={(e) => setUuid(e.target.value)}
+          hidden
+        />
+      </div>
+      <div className="relative mb-6">
+        <input
+          type="password"
+          name="password"
+          className="input input-bordered w-full max-w-xs"
+          id="password"
+          autoComplete="true"
+          placeholder="Password"
+        />
+      </div>
+      <div className="text-center">
+        <button
+          type="submit"
+          className="btn btn-success"
+          data-te-ripple-init
+          data-te-ripple-color="light"
+        >
+          {isSignedUp ? "Login" : "Sign up"}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export const RequireAuth = (props: Props) => {
+  const [uuid, setUuid] = useState("");
+  const [isRead, setIsRead] = useState(false);
+  const { isSignedUp, checkIfSignedUp, signUp } = useSignUp();
+  const { processing, isSignedIn, signIn } = useSignIn();
+
+  const signInHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const password = (e.target as HTMLFormElement).password.value;
+    await signIn(uuid, password);
   };
 
   const signUpHandler = async (e: FormEvent) => {
@@ -26,150 +111,32 @@ export const RequireAuth = (props: Props) => {
     await signUp(uuid, password);
   };
 
-  const signInHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const password = (e.target as HTMLFormElement).password.value;
-    await signIn(uuid, password);
-  };
-
-  const PasswordForm = () => {
-    return (
-      <div className="w-[300px] h-[450px] mx-auto mt-16 border shadow-xl rounded-3xl">
-        <div className="g-6 flex h-full flex-wrap items-center justify-center">
-          <div className="mb-12 md:mb-0 w-full text-center p-5">
-            {!isRead && isReaderOn && (
-              <>
-                <QrReader
-                  onResult={(result) => {
-                    if (result) {
-                      navigator.mediaDevices
-                        .getUserMedia({
-                          audio: false,
-                          video: true,
-                        })
-                        .then((stream) => {
-                          stream.getTracks().forEach(function (track) {
-                            track.stop();
-                            track.enabled = false;
-                          });
-                        });
-                      setIsRead(true);
-                      checkIfSignedUp(result.getText());
-                      setUuid(result.getText());
-                    }
-                  }}
-                  constraints={{ facingMode: undefined }}
-                />
-              </>
-            )}
-            {!isRead && (
-              <button className="btn btn-primary mt-5" onClick={clickHandler}>
-                Read QRCode
-              </button>
-            )}
-            {isRead && isSignedUp && (
-              <>
-                <form onSubmit={signInHandler}>
-                  <h1 className="text-2xl">Successfully scanned!</h1>
-                  <p className="text-lg">Please complete your password.</p>
-                  <div className="relative mb-6">
-                    <input
-                      type="text"
-                      name="id"
-                      className="input input-bordered w-full max-w-xs"
-                      id="id"
-                      placeholder="id"
-                      defaultValue={uuid}
-                      hidden
-                    />
-                  </div>
-
-                  <div className="relative mb-6">
-                    <input
-                      type="password"
-                      name="password"
-                      className="input input-bordered w-full max-w-xs"
-                      id="password"
-                      autoComplete="true"
-                      placeholder="Password"
-                    />
-                  </div>
-
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="btn btn-success"
-                      data-te-ripple-init
-                      data-te-ripple-color="light"
-                    >
-                      Login
-                    </button>
-                  </div>
-                </form>
-              </>
-            )}
-
-            {isRead && !isSignedUp && (
-              <>
-                <form onSubmit={signUpHandler}>
-                  <h1 className="text-2xl">Successfully scanned!</h1>
-                  <p className="text-lg">Please set up your password first.</p>
-                  <div className="relative mb-6">
-                    <input
-                      type="text"
-                      name="id"
-                      className="input input-bordered w-full max-w-xs"
-                      id="id"
-                      placeholder="id"
-                      defaultValue={uuid}
-                      onChange={(e) => setUuid(e.target.value)}
-                      hidden
-                    />
-                  </div>
-
-                  <div className="relative mb-6">
-                    <input
-                      type="password"
-                      name="password"
-                      className="input input-bordered w-full max-w-xs"
-                      id="password"
-                      autoComplete="true"
-                      placeholder="Password"
-                    />
-                  </div>
-                  {/* <div className="reactive mb-6" data-to-input-wrapper-init>
-                    <input
-                      type="password"
-                      className="input input-bordered w-full max-w-xs"
-                      id="password-confirm"
-                      autoComplete="false"
-                      placeholder="Password confirmation"
-                      onChange={(e) => setPasswordConfirm(e.target.value)}
-                    />
-                  </div> */}
-
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="btn btn-success"
-                      data-te-ripple-init
-                      data-te-ripple-color="light"
-                    >
-                      Sign up
-                    </button>
-                  </div>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    );
+  const handleRead = (result: string) => {
+    setIsRead(true);
+    checkIfSignedUp(result);
+    setUuid(result);
   };
 
   return (
     <>
-      {!processing && !isSignedIn && <PasswordForm />}
+      {!processing && !isSignedIn && (
+        <div className="w-[300px] h-[450px] mx-auto mt-16 border shadow-xl rounded-3xl">
+          <div className="g-6 flex h-full flex-wrap items-center justify-center">
+            <div className="mb-12 md:mb-0 w-full text-center p-5">
+              {!isRead && <QRCodeReader onRead={handleRead} />}
+              {isRead && (
+                <AuthForm
+                  uuid={uuid}
+                  isRead={isRead}
+                  isSignedUp={isSignedUp}
+                  signInHandler={signInHandler}
+                  signUpHandler={signUpHandler}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {!processing && isSignedIn && props.children}
     </>
   );
