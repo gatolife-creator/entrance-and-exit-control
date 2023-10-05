@@ -14,8 +14,6 @@ function handleScan(req: express.Request, res: express.Response) {
     return;
   }
 
-  memberDB.historyInitToday(uuid);
-
   if (!memberDB.isEnteredToday(uuid)) {
     memberDB.enter(uuid);
     res.status(200).json({ message: `The member ${uuid} entered` });

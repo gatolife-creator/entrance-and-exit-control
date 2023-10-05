@@ -64,7 +64,7 @@ export class Member {
 
   setPassword(password: string) {
     this.salt = uuidv4();
-    this.password = Member.stretch(password + this.salt + PEPPER).toString();
+    this.password = this.stretch(password + this.salt + PEPPER).toString();
   }
 
   getPassword() {
@@ -73,7 +73,7 @@ export class Member {
 
   isValidPassword(password: string) {
     return (
-      this.password === Member.stretch(password + this.salt + PEPPER).toString()
+      this.password === this.stretch(password + this.salt + PEPPER).toString()
     );
   }
 
@@ -87,7 +87,7 @@ export class Member {
     };
   }
 
-  static stretch(message: string) {
+  private stretch(message: string) {
     let hash = message;
     for (let i = 0; i < 10000; i++) {
       hash = SHA256(hash).toString();

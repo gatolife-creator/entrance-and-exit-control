@@ -1,18 +1,37 @@
 import { v4 as uuidv4 } from "uuid";
-import { Member } from "./member";
-import { SerializedMemberType } from "./member";
+import { Member, SerializedMemberType } from "./member";
 
 export class MemberDB {
   private members: Map<string, Member>;
+
   constructor(members?: Map<string, Member>) {
     this.members = members || new Map<string, Member>();
+  }
+
+  private getMemberOrThrow(uuid: string): Member {
+    const member = this.members.get(uuid);
+    if (!member) {
+      throw new Error(`The member ${uuid} does not exist`);
+    }
+    return member;
+  }
+
+  private getCurrentDate(): string {
+    const date = new Date();
+    date.setTime(
+      date.getTime() + (date.getTimezoneOffset() + 9 * 60) * 60 * 1000
+    );
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+    const dd = date.getDate().toString().padStart(2, "0");
+    return `${yyyy}/${mm}/${dd}`;
   }
 
   addSpecifiedMember(uuid: string, member: Member) {
     this.members.set(uuid, member);
   }
 
-  add(member: Member) {
+  add(member: Member): string {
     const uuid = uuidv4();
     this.members.set(uuid, member);
     return uuid;
@@ -22,122 +41,86 @@ export class MemberDB {
     this.members.delete(uuid);
   }
 
-  getMember(uuid: string) {
+  getMember(uuid: string): Member | undefined {
     return this.members.get(uuid);
   }
 
-  getMembers() {
+  getMembers(): Map<string, Member> {
     return this.members;
   }
 
-  historyInitToday(uuid: string) {
-    const member = this.getMember(uuid);
-    const date = JST();
-    if (!member) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    if (!member.history.hasOwnProperty(date)) {
-      member.history = { [date]: { enter: {}, exit: {} } };
+  private initializeHistory(uuid: string) {
+    const member = this.getMemberOrThrow(uuid);
+    const date = this.getCurrentDate();
+    if (!member.history[date]) {
+      member.history[date] = {
+        enter: { status: false, timestamp: NaN },
+        exit: { status: false, timestamp: NaN },
+      };
     }
   }
 
-  isEnteredToday(uuid: string) {
-    const member = this.getMember(uuid);
-    const date = JST();
-    if (!member) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    return member.history[date].enter.status;
+  private updateHistoryStatus(
+    uuid: string,
+    type: "enter" | "exit",
+    status: boolean
+  ) {
+    const member = this.getMemberOrThrow(uuid);
+    const date = this.getCurrentDate();
+    this.initializeHistory(uuid);
+    member.history[date][type] = { status, timestamp: Date.now() };
   }
 
-  isExitedToday(uuid: string) {
-    const member = this.getMember(uuid);
-    const date = JST();
-    if (!member) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    return member.history[date].exit.status;
+  isEnteredToday(uuid: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    const date = this.getCurrentDate();
+    this.initializeHistory(uuid);
+    return member.history[date].enter.status as boolean;
+  }
+
+  isExitedToday(uuid: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    const date = this.getCurrentDate();
+    this.initializeHistory(uuid);
+    return member.history[date].exit.status as boolean;
   }
 
   enter(uuid: string) {
-    const member = this.getMember(uuid);
-    if (member) {
-      member.history[JST()]["enter"] = {
-        status: true,
-        timestamp: Date.now(),
-      };
-      member.history[JST()]["exit"] = { status: false, timestamp: NaN };
-    }
+    this.updateHistoryStatus(uuid, "enter", true);
   }
 
   exit(uuid: string) {
-    const member = this.getMember(uuid);
-    if (member) {
-      member.history[JST()].exit = { status: true, timestamp: Date.now() };
-    }
+    this.updateHistoryStatus(uuid, "exit", true);
   }
 
-  isExist(uuid: string) {
-    const member = this.getMember(uuid);
-    if (member) {
-      return true;
-    } else {
-      return false;
-    }
+  isExist(uuid: string): boolean {
+    return this.members.has(uuid);
   }
 
-  isAdmin(uuid: string) {
-    if (!this.isExist(uuid)) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    return this.getMember(uuid)?.role === "admin";
+  isAdmin(uuid: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    return member.role === "admin";
   }
 
-  isPasswordSetUp(uuid: string) {
-    if (!this.isExist(uuid)) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    if (this.getMember(uuid)?.getPassword()) {
-      return true;
-    } else {
-      return false;
-    }
+  isPasswordSetUp(uuid: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    return Boolean(member.getPassword());
   }
 
   setPassword(uuid: string, password: string) {
-    if (!this.isExist(uuid)) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    this.getMember(uuid)?.setPassword(password);
+    const member = this.getMemberOrThrow(uuid);
+    member.setPassword(password);
   }
 
-  isValidPassword(uuid: string, password: string) {
-    if (!this.isExist(uuid)) {
-      throw new Error(`The member ${uuid} is not exist`);
-    }
-    return this.getMember(uuid)?.isValidPassword(password);
+  isValidPassword(uuid: string, password: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    return member.isValidPassword(password);
   }
 
-  serialize() {
-    const members = this.getMembers();
-    const serialized: [string, SerializedMemberType][] = [];
-
-    members.forEach((member, id) => {
-      serialized.push([id, member.serialize()]);
-    });
-    return serialized;
+  serialize(): [string, SerializedMemberType][] {
+    return Array.from(this.members.entries()).map(([id, member]) => [
+      id,
+      member.serialize(),
+    ]);
   }
 }
-
-const JST = () => {
-  const date = new Date();
-  date.setTime(
-    date.getTime() + (date.getTimezoneOffset() + 9 * 60) * 60 * 1000
-  );
-
-  const yyyy = date.getFullYear();
-  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
-  const dd = date.getDate().toString().padStart(2, "0");
-
-  return `${yyyy}/${mm}/${dd}`;
-};
