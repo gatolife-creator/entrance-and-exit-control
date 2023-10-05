@@ -1,22 +1,51 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useMembers } from "../hooks/useMembers";
+import { SerializedMemberType } from "../../../server/utils/member";
+
+const MemberRow = ({
+  memberData,
+}: {
+  memberData: [string, SerializedMemberType];
+}) => {
+  const [, member] = memberData;
+  return (
+    <tr>
+      <th>
+        <label>
+          <input type="checkbox" className="checkbox" />
+        </label>
+      </th>
+      <td>
+        <div className="flex items-center space-x-3">
+          <div>
+            <div className="font-bold">{member.name}</div>
+          </div>
+        </div>
+      </td>
+      <td>{member.age}</td>
+      <td>{member.gender}</td>
+      <th>
+        <button className="btn btn-ghost btn-xs">details</button>
+      </th>
+    </tr>
+  );
+};
 
 export const AdminTable = () => {
   const { members, addMember } = useMembers();
   const [name, setName] = useState("");
-  const [age, setAge] = useState(NaN);
-  const [gender, setGender] = useState<"male" | "female">("male");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("male");
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
-    addMember(name, age, gender);
+    addMember(name, parseInt(age), gender as "male" | "female");
   };
 
   return (
     <>
       <h1 className="text-4xl font-bold text-center py-10">部員管理</h1>
       <table className="table mb-10">
-        {/* head */}
         <thead>
           <tr>
             <th>
@@ -31,29 +60,10 @@ export const AdminTable = () => {
           </tr>
         </thead>
         <tbody>
-          {members.map(([, member], index) => (
-            <tr key={index}>
-              <th>
-                <label>
-                  <input type="checkbox" className="checkbox" />
-                </label>
-              </th>
-              <td>
-                <div className="flex items-center space-x-3">
-                  <div>
-                    <div className="font-bold">{member.name}</div>
-                  </div>
-                </div>
-              </td>
-              <td>{member.age}</td>
-              <td>{member.gender}</td>
-              <th>
-                <button className="btn btn-ghost btn-xs">details</button>
-              </th>
-            </tr>
+          {members.map((member, index) => (
+            <MemberRow key={index} memberData={member} />
           ))}
         </tbody>
-        {/* foot */}
         <tfoot>
           <tr>
             <th></th>
@@ -67,11 +77,12 @@ export const AdminTable = () => {
 
       <button
         className="btn btn-success"
-        onClick={() =>
-          (
-            document.getElementById("my_modal_1") as HTMLDialogElement
-          ).showModal()
-        }
+        onClick={() => {
+          const modal = document.getElementById(
+            "my_modal_1"
+          ) as HTMLDialogElement;
+          modal.showModal();
+        }}
       >
         部員追加
       </button>
@@ -83,38 +94,58 @@ export const AdminTable = () => {
               type="text"
               className="input input-bordered w-full max-w-xs"
               placeholder="名前"
+              value={name}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setName(e.target.value)
               }
+              required
             />
             <input
-              type="text"
+              type="number"
               className="input input-bordered w-full max-w-xs"
               placeholder="年齢"
+              value={age}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setAge(Number(e.target.value))
+                setAge(e.target.value)
               }
+              required
             />
             <select
               className="select select-bordered w-full max-w-xs"
+              value={gender}
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                setGender(e.target.value as "male" | "female")
+                setGender(e.target.value)
               }
+              required
             >
               <option value="male">男性</option>
               <option value="female">女性</option>
             </select>
             <br />
-            <button className="btn btn-primary">add</button>
+            <button type="submit" className="btn btn-primary">
+              add
+            </button>
           </form>
           <div className="modal-action">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn">閉じる</button>
-            </form>
+            <button
+              className="btn"
+              onClick={() => {
+                const modal = document.getElementById(
+                  "my_modal_1"
+                ) as HTMLDialogElement;
+                modal.close();
+                setName("");
+                setAge("");
+                setGender("male");
+              }}
+            >
+              閉じる
+            </button>
           </div>
         </div>
       </dialog>
     </>
   );
 };
+
+export default AdminTable;

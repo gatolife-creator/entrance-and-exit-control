@@ -29,13 +29,13 @@ export const RequireAdmin = (props: Props) => {
     setProcessing(false);
   };
 
-  return (
-    <>
-      {isAdmin && props.children}
-      {!processing && !isAdmin && (
-        <p>Admin privilege is required to view this page.</p>
-      )}
-      {processing && <Processing />}
-    </>
-  );
+  if (processing) {
+    return <Processing />;
+  }
+
+  if (isAdmin) {
+    return <>{props.children}</>;
+  }
+
+  return <p>Admin privilege is required to view this page.</p>;
 };
