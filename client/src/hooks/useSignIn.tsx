@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
+import { uuidState } from "../utils/atom";
 
 export const useSignIn = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const setUuid = useSetRecoilState(uuidState);
   const [processing, setProcessing] = useState(false);
   const notify = () =>
     toast.error("Fail to sign in", { position: "bottom-right" });
@@ -22,6 +25,8 @@ export const useSignIn = () => {
 
     if (res.status === 200) {
       setIsSignedIn(true);
+      const data = await res.json();
+      setUuid(data.uuid);
     }
     setProcessing(false);
   };
@@ -41,6 +46,7 @@ export const useSignIn = () => {
 
     if (res.status === 200) {
       setIsSignedIn(true);
+      setUuid(uuid);
     } else if (res.status === 401) {
       notify();
     }

@@ -46,7 +46,7 @@ router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
 
 router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
   if (req.session.uuid) {
-    res.sendStatus(200);
+    res.status(200).json({ uuid: req.session.uuid });
   } else {
     res.status(401).json({ message: "Not signed in" });
   }
