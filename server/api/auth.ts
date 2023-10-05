@@ -1,58 +1,65 @@
 import express from "express";
-import { adminId } from "./members";
-import { memberDB } from "./members";
+import { adminId, memberDB } from "./members";
 
 const router = express.Router();
 
-router.post("/signup", (req: express.Request, res: express.Response) => {
+router.post("/signup", handleSignup);
+router.post("/signin", handleSignin);
+router.post("/signinAsAdmin", handleSigninAsAdmin);
+router.post("/isSignedIn", handleIsSignedIn);
+router.post("/isSignedUp", handleIsSignedUp);
+
+function handleSignup(req: express.Request, res: express.Response) {
   const { uuid, password } = req.body;
   try {
-    signup(uuid, password);
+    memberDB.setPassword(uuid, password);
     req.session.uuid = uuid;
     res.sendStatus(200);
   } catch (e) {
-    if (e instanceof Error) {
-      res.status(401).json({ message: e.message });
-    }
+    handleError(res, e);
   }
-});
+}
 
-router.post("/signin", (req: express.Request, res: express.Response) => {
+function handleSignin(req: express.Request, res: express.Response) {
   const { uuid, password } = req.body;
   try {
-    signin(uuid, password);
-    req.session.uuid = uuid;
-    res.sendStatus(200);
-  } catch (e) {
-    if (e instanceof Error) {
-      res.status(401).json({ message: e.message });
+    if (memberDB.isValidPassword(uuid, password)) {
+      req.session.uuid = uuid;
+      res.sendStatus(200);
+    } else {
+      throw new Error(`Wrong password: ${password}`);
     }
+  } catch (e) {
+    handleError(res, e);
   }
-});
+}
 
-router.post("/signinAsAdmin", (req: express.Request, res: express.Response) => {
+function handleSigninAsAdmin(req: express.Request, res: express.Response) {
   const { password } = req.body;
-  console.log(req.body);
   try {
-    signinAsAdmin(adminId, password);
-    req.session.uuid = adminId;
-    res.sendStatus(200);
-  } catch (e) {
-    if (e instanceof Error) {
-      res.status(401).json({ message: e.message });
+    if (
+      memberDB.isAdmin(adminId) &&
+      memberDB.isValidPassword(adminId, password)
+    ) {
+      req.session.uuid = adminId;
+      res.sendStatus(200);
+    } else {
+      throw new Error("Invalid admin credentials");
     }
+  } catch (e) {
+    handleError(res, e);
   }
-});
+}
 
-router.post("/isSignedIn", (req: express.Request, res: express.Response) => {
+function handleIsSignedIn(req: express.Request, res: express.Response) {
   if (req.session.uuid) {
     res.status(200).json({ uuid: req.session.uuid });
   } else {
     res.status(401).json({ message: "Not signed in" });
   }
-});
+}
 
-router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
+function handleIsSignedUp(req: express.Request, res: express.Response) {
   const { uuid } = req.body;
 
   if (!memberDB.isExist(uuid)) {
@@ -63,26 +70,12 @@ router.post("/isSignedUp", (req: express.Request, res: express.Response) => {
     res.sendStatus(200);
     console.log("Already signed up");
   }
-});
+}
 
-const signup = (uuid: string, password: string) => {
-  memberDB.setPassword(uuid, password);
-};
-
-const signin = (uuid: string, password: string) => {
-  if (!memberDB.isValidPassword(uuid, password)) {
-    throw new Error(`Wrong password: ${password}`);
+function handleError(res: express.Response, error: any) {
+  if (error instanceof Error) {
+    res.status(401).json({ message: error.message });
   }
-};
-
-const signinAsAdmin = (uuid: string, password: string) => {
-  if (!memberDB.isAdmin(uuid)) {
-    throw new Error("Not an admin");
-  }
-
-  if (!memberDB.isValidPassword(uuid, password)) {
-    throw new Error(`Wrong password: ${password}`);
-  }
-};
+}
 
 export { router };

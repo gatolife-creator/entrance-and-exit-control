@@ -42,18 +42,22 @@ QRCode.toFile("resources/admin.png", adminId);
 QRCode.toFile("resources/dummy.png", dummyId);
 
 router.use(express.json());
+router.use(checkAuthorization);
+router.get("/isAdmin", checkAdminStatus);
 
-router.use(
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (!req.session.uuid) {
-      res.status(401).json({ message: "Unauthorized" });
-    } else {
-      next();
-    }
+function checkAuthorization(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  if (!req.session.uuid) {
+    res.status(401).json({ message: "Unauthorized" });
+  } else {
+    next();
   }
-);
+}
 
-router.get("/isAdmin", (req: express.Request, res: express.Response) => {
+function checkAdminStatus(req: express.Request, res: express.Response) {
   const uuid = req.session.uuid as string;
   const isAdmin = memberDB.isAdmin(uuid);
   if (isAdmin) {
@@ -61,6 +65,6 @@ router.get("/isAdmin", (req: express.Request, res: express.Response) => {
   } else {
     res.status(401).json({ message: `The member ${uuid} is not an admin` });
   }
-});
+}
 
 export { router };

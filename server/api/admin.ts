@@ -1,55 +1,56 @@
 import express from "express";
-import _ from "express-session";
-
 import { Member } from "../utils/member";
 import { memberDB } from "./members";
 
 const router = express.Router();
 
-declare module "express-session" {
-  export interface SessionData {
-    uuid: string;
+router.use(checkAuthorization);
+
+router.get("/members", getMembers);
+router.get("/profile", getMemberProfile);
+router.post("/add", addMember);
+
+function checkAuthorization(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  const { uuid } = req.session;
+  console.log(uuid);
+  if (!uuid) {
+    res.status(401).json({ message: "Unauthorized" });
+  } else if (memberDB.isAdmin(uuid)) {
+    next();
+  } else {
+    res.status(401).json({ message: "Not added as an admin" });
   }
 }
 
-router.use(
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const { uuid } = req.session;
-    console.log(uuid);
-    if (!uuid) {
-      res.status(401).json({ message: "Unauthorized" });
-    } else if (memberDB.isAdmin(uuid)) {
-      next();
-    } else {
-      res.status(401).json({ message: "Not added as an admin" });
-    }
-  }
-);
-
-router.get("/members", (_: express.Request, res: express.Response) => {
+function getMembers(req: express.Request, res: express.Response) {
   res.json({ members: memberDB.serialize() });
-});
+}
 
-router.get("/profile", (req: express.Request, res: express.Response) => {
+function getMemberProfile(req: express.Request, res: express.Response) {
   const { uuid } = req.body;
-  res.json(memberDB.getMember(uuid));
-});
+  const member = memberDB.getMember(uuid);
+  if (member) {
+    res.json(member);
+  } else {
+    res.status(404).json({ message: `Member with UUID ${uuid} not found` });
+  }
+}
 
-router.post("/add", (req: express.Request, res: express.Response) => {
+function addMember(req: express.Request, res: express.Response) {
   const { name, age, gender } = req.body;
-  const member = new Member({
+  const newMember = new Member({
     name: name as string,
     age: Number(age),
     gender: gender as "male" | "female",
     role: "member",
   });
 
-  const uuid = memberDB.add(member);
-  res.status(200).json([uuid, member.serialize()]);
-});
+  const uuid = memberDB.add(newMember);
+  res.status(200).json([uuid, newMember.serialize()]);
+}
 
-// router.delete("/remove", (req: express.Request) => {
-//   const { index } = req.body;
-//   remove(index);
-// });
 export { router };

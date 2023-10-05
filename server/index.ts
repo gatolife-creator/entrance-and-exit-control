@@ -12,7 +12,7 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const session_option = {
+const sessionOptions: session.SessionOptions = {
   secret: process.env.SESSION_SECRET_KEY as string,
   cookie: {
     maxAge: 60 * 60 * 1000,
@@ -20,10 +20,10 @@ const session_option = {
 };
 
 app.use(express.json());
-
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../client/dist")));
-app.use(session(session_option));
+app.use(session(sessionOptions));
+
 app.use("/api/members", membersRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/auth", authRouter);
