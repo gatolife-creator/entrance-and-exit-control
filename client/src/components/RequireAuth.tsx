@@ -1,8 +1,8 @@
 import { FormEvent, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import { QrReader } from "react-qr-reader";
 import { useSignUp } from "../hooks/useSignUp";
 import { useSignIn } from "../hooks/useSignIn";
-import { useSetRecoilState } from "recoil";
 import { uuidState } from "../utils/atom";
 
 type Props = {
