@@ -8,6 +8,7 @@ import { Navbar } from "./components/Navbar";
 import { Home } from "./pages/Home";
 import { Status } from "./pages/Status";
 import { AdminPage } from "./pages/AdminPage";
+import { Gate } from "./pages/Gate";
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/status" element={<Status />} />
-          <Route path="/admin" element={<AdminPage />}></Route>
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/gate" element={<Gate />} />
         </Routes>
       </AnimatePresence>
     </RecoilRoot>
