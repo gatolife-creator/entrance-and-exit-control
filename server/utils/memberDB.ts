@@ -49,6 +49,19 @@ export class MemberDB {
     return this.members;
   }
 
+  getAttendeesToday(): Map<string, Member> {
+    const date = this.getCurrentDate();
+    return new Map(
+      Array.from(this.members).filter(
+        ([_, member]) => member.history[date].enter.status
+      )
+    );
+  }
+
+  getNumOfAttendeesToday(): number {
+    return this.getAttendeesToday().size;
+  }
+
   private initializeHistory(uuid: string) {
     const member = this.getMemberOrThrow(uuid);
     const date = this.getCurrentDate();
@@ -115,6 +128,15 @@ export class MemberDB {
   isValidPassword(uuid: string, password: string): boolean {
     const member = this.getMemberOrThrow(uuid);
     return member.isValidPassword(password);
+  }
+
+  static serialize(
+    data: Map<string, Member>
+  ): [string, SerializedMemberType][] {
+    return Array.from(data.entries()).map(([id, member]) => [
+      id,
+      member.serialize(),
+    ]);
   }
 
   serialize(): [string, SerializedMemberType][] {
