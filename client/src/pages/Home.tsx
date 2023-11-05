@@ -63,7 +63,7 @@ export const Home = () => {
         <RequireAuth>
           <div className="mx-auto max-w-[800px]">
             <div className="h-[400px] mb-5 p-10 rounded-lg shadow-lg mt-10">
-              <Line className="mx-auto" options={options} data={data} />
+              <Line className="mx-auto w-full" options={options} data={data} />
             </div>
             <div className="text-center w-full">
               <div className="stats shadow">
