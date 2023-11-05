@@ -32,34 +32,7 @@ export const Navbar = () => {
   return (
     <>
       <div className="navbar fixed top-3 left-2 bg-base-100 rounded-3xl shadow-lg w-[calc(100%-1rem)] border border-gray">
-        <div className="navbar-start">
-          <div className="dropdown">
-            <label tabIndex={0} className="btn btn-ghost btn-circle">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h7"
-                />
-              </svg>
-            </label>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <NavbarItem text="Homepage" link="#" />
-              <NavbarItem text="Portfolio" link="#" />
-              <NavbarItem text="About" link="#" />
-            </ul>
-          </div>
-        </div>
+        <div className="navbar-start" />
         <div className="navbar-center">
           <Link to="/" className="btn btn-ghost normal-case text-xl">
             MetaNuts 🥜
