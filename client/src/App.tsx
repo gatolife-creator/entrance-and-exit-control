@@ -9,6 +9,7 @@ import { Home } from "./pages/Home";
 import { Status } from "./pages/Status";
 import { AdminPage } from "./pages/AdminPage";
 import { Gate } from "./pages/Gate";
+import { NotFound } from "./pages/NotFound";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/status" element={<Status />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/gate" element={<Gate />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
     </RecoilRoot>
