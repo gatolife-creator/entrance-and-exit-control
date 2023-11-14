@@ -50,10 +50,13 @@ export class MemberDB {
   }
 
   getAttendeesToday(): Map<string, Member> {
-    const date = this.getCurrentDate();
+    return this.getAttendeesOnSpecifiedDate(this.getCurrentDate());
+  }
+
+  getAttendeesOnSpecifiedDate(date: string): Map<string, Member> {
     return new Map(
-      Array.from(this.members).filter(
-        ([_, member]) => member.history[date].enter.status
+      Array.from(this.members).filter(([uuid]) =>
+        this.isEnteredOnSpecifiedDate(uuid, date)
       )
     );
   }
@@ -63,8 +66,11 @@ export class MemberDB {
   }
 
   private initializeHistory(uuid: string) {
+    this.initializeHistoryOnSpecifiedDate(uuid, this.getCurrentDate());
+  }
+
+  private initializeHistoryOnSpecifiedDate(uuid: string, date: string) {
     const member = this.getMemberOrThrow(uuid);
-    const date = this.getCurrentDate();
     if (!member.history[date]) {
       member.history[date] = {
         enter: { status: false, timestamp: NaN },
@@ -91,10 +97,22 @@ export class MemberDB {
     return member.history[date].enter.status as boolean;
   }
 
+  isEnteredOnSpecifiedDate(uuid: string, date: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    this.initializeHistoryOnSpecifiedDate(uuid, date);
+    return member.history[date].enter.status as boolean;
+  }
+
   isExitedToday(uuid: string): boolean {
     const member = this.getMemberOrThrow(uuid);
     const date = this.getCurrentDate();
     this.initializeHistory(uuid);
+    return member.history[date].exit.status as boolean;
+  }
+
+  isExitedOnSpecifiedDate(uuid: string, date: string): boolean {
+    const member = this.getMemberOrThrow(uuid);
+    this.initializeHistoryOnSpecifiedDate(uuid, date);
     return member.history[date].exit.status as boolean;
   }
 

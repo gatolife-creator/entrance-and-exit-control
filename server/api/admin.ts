@@ -1,6 +1,7 @@
 import express from "express";
 import { Member } from "../utils/member";
 import { memberDB } from "./members";
+import { MemberDB } from "../utils/memberDB";
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ router.use(checkAuthorization);
 router.get("/members", getMembers);
 router.get("/profile", getMemberProfile);
 router.post("/add", addMember);
+router.get("/attendees", getAttendees);
 
 function checkAuthorization(
   req: express.Request,
@@ -26,7 +28,7 @@ function checkAuthorization(
   }
 }
 
-function getMembers(req: express.Request, res: express.Response) {
+function getMembers(_: express.Request, res: express.Response) {
   res.json({ members: memberDB.serialize() });
 }
 
@@ -51,6 +53,16 @@ function addMember(req: express.Request, res: express.Response) {
 
   const uuid = memberDB.add(newMember);
   res.status(200).json([uuid, newMember.serialize()]);
+}
+
+function getAttendees(
+  req: express.Request<any, any, any, { date: string }>,
+  res: express.Response
+) {
+  const date = req.query.date;
+  res.json({
+    attendees: MemberDB.serialize(memberDB.getAttendeesOnSpecifiedDate(date)),
+  });
 }
 
 export { router };
